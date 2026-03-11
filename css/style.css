@@ -1,0 +1,207 @@
+:root {
+    --green: rgba(61, 122, 107, 1);
+    --bg-color: #414141;
+}
+
+body {
+    background-color: var(--bg-color);
+    font-family: sans-serif;
+    margin: 0;
+}
+
+h1, h2 {
+    text-align: center;
+    color: white; /* Ajouté pour la visibilité sur fond gris */
+}
+
+/* --- ZONE DE RECHERCHE (SELECT) --- */
+#filtre {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+/* Mise en forme de la div .select */
+.select {
+    position: relative;
+    width: 350px;
+    height: 45px;
+    overflow: hidden;
+    border-radius: 5px;
+    border: 1px solid #ced4da;
+    background: #f9f9f9;
+}
+
+/* Mise en forme de la balise select */
+select {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding-left: 15px;
+    color: #555555;
+    cursor: pointer;
+    appearance: none; /* Supprime le style par défaut du navigateur */
+    border: none;
+    background: transparent;
+    font-size: 1.2em;
+    outline: none;
+}
+
+/* Flèche personnalisée */
+.select::after {
+    content: '\276F';
+    position: absolute;
+    top: 10px;
+    right: 0;
+    padding: 0 15px;
+    background: #f9f9f9;
+    pointer-events: none;
+    transform: rotate(90deg);
+    font-size: 1.5em;
+    color: #555;
+}
+
+.select:hover::after {
+    color: #fa6141;
+}
+
+/* --- NOUVEAUX FILTRES PAR TYPES --- */
+#types {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin: 20px auto;
+    max-width: 1000px;
+    padding: 0 10px;
+}
+
+.type-filter {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 80px;
+    height: 80px;
+    background-color: #fff;
+    border-radius: 50%; /* Cercle */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    border: 3px solid transparent;
+}
+
+.type-filter img {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+    margin-bottom: 5px;
+}
+
+.type-filter p {
+    margin: 0;
+    font-size: 0.75em;
+    font-weight: bold;
+    color: #333;
+    text-transform: capitalize;
+}
+
+/* Effet au survol */
+.type-filter:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.5);
+}
+
+/* Filtre Actif (Sélectionné) */
+.type-filter.active {
+    background-color: #fffde7;
+    border-color: #ff9800; /* Bordure orange quand actif */
+    transform: scale(1.1);
+}
+
+/* Bouton Reset Spécial */
+.type-filter.reset-btn p {
+    font-size: 1em; /* Texte un peu plus gros pour 'TOUT' */
+}
+
+/* --- GRILLE DES POKEMONS (MAIN) --- */
+main {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    padding: 2%;
+}
+
+article {
+    width: 300px; /* Légèrement réduit pour mieux tenir sur les petits écrans */
+    border-radius: 20px;
+    /* La couleur de fond et la bordure sont gérées par le JS maintenant */
+    overflow: hidden;
+    margin: 15px;
+    box-shadow: -1px 2px 13px 0px rgba(0, 0, 0, 0.5);
+    transition: transform 0.2s;
+    position: relative; /* Pour positionner le span .types */
+}
+
+article:hover {
+    transform: scale(1.02);
+}
+
+figure {
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+}
+
+picture {
+    display: block;
+    background-color: rgba(0, 0, 0, 0.1);
+    padding: 20px 0;
+}
+
+article img {
+    width: 70%;
+    margin: auto;
+    display: block;
+    filter: drop-shadow(5px 5px 5px rgba(0, 0, 0, 0.5));
+}
+
+figcaption {
+    background-color: rgba(255, 255, 255, 0.7);
+    position: relative;
+    padding-top: 10px;
+}
+
+h2 {
+    color: #333;
+    margin: 10px 0;
+    text-transform: capitalize;
+}
+
+ol {
+    list-style: none;
+    margin: 0;
+    padding: 0 20px 20px 20px;
+    color: #333;
+    font-weight: 500;
+}
+
+ol li {
+    margin-bottom: 5px;
+}
+
+/* Badge des types sur la carte */
+.types {
+    background-color: rgba(0, 0, 0, 0.7);
+    color: #fff;
+    padding: 5px 12px;
+    position: absolute;
+    top: -40px; /* Ajusté pour être sur l'image ou juste au-dessus du titre */
+    left: 10px;
+    border-radius: 20px;
+    font-size: 0.9em;
+    z-index: 10;
+}
