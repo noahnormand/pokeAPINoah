@@ -1,4 +1,5 @@
-const selectGen = document.querySelector("select");
+const selectGen = document.querySelector("#select-gen"); // Attention si tu as 2 select, il vaut mieux utiliser l'ID : document.querySelector("#ton-id-gen")
+const selectTri = document.querySelector("#tri-pokemon"); // Ajout du sélecteur pour le tri
 const conteneurMain = document.querySelector("main");
 const divBadges = document.querySelector("#types");
 
@@ -7,37 +8,44 @@ let typesSelectionnes = [];
 
 const avoirCouleur = (type) => {
     const couleurs = {
-        "Plante": "green",
-        "Feu": "orange",
-        "Eau": "blue",
-        "Insecte": "lightgreen",
-        "Normal": "lightgray",
-        "Électrik": "yellow",
-        "Poison": "purple",
-        "Combat": "red",
-        "Sol": "burlywood",
-        "Roche": "darkkhaki",
-        "Spectre": "indigo",
-        "Acier": "silver",
-        "Glace": "lightblue",
-        "Dragon": "royalblue",
-        "Fée": "pink",
-        "Ténèbres": "darkslategray",
-        "Psy": "hotpink",
-        "Vol": "skyblue"
+        "Plante": "green", "Feu": "orange", "Eau": "blue", "Insecte": "lightgreen",
+        "Normal": "lightgray", "Électrik": "yellow", "Poison": "purple", "Combat": "red",
+        "Sol": "burlywood", "Roche": "darkkhaki", "Spectre": "indigo", "Acier": "silver",
+        "Glace": "lightblue", "Dragon": "royalblue", "Fée": "pink", "Ténèbres": "darkslategray",
+        "Psy": "hotpink", "Vol": "skyblue"
     };
     return couleurs[type] || "white";
 };
 
 const afficherLesPokemons = () => {
+    // 1. Filtrage
     let pkmFiltres = listePokemons.filter(pokemon => {
         if (typesSelectionnes.length === 0) return true;
         let lesTypesDuPkm = pokemon.types.map(t => t.name);
         return typesSelectionnes.every(typeChoisi => lesTypesDuPkm.includes(typeChoisi));
     });
 
-    let pkmTries = pkmFiltres.sort((a, b) => a.pokedexId - b.pokedexId);
+    // 2. Tri
+    let critereTri = selectTri ? selectTri.value : "id";
+    let pkmTries = pkmFiltres.sort((a, b) => {
+        switch (critereTri) {
+            case "nom":
+                return a.name.fr.localeCompare(b.name.fr);
+            case "type":
+                return a.types[0].name.localeCompare(b.types[0].name);
+            case "hp":
+                return b.stats.hp - a.stats.hp; // Plus grand au plus petit
+            case "atk":
+                return b.stats.atk - a.stats.atk;
+            case "def":
+                return b.stats.def - a.stats.def;
+            case "id":
+            default:
+                return a.pokedexId - b.pokedexId; // Plus petit au plus grand
+        }
+    });
 
+    // 3. Affichage
     let cartesHtml = pkmTries.map(pokemon => {
         let type1 = pokemon.types[0].name;
         let couleur1 = avoirCouleur(type1);
@@ -95,13 +103,22 @@ const chargerApi = async (valeurGen) => {
     }
 };
 
+// Écouteur pour la génération
 selectGen.addEventListener("change", (event) => {
     if (event.target.value) {
         chargerApi(event.target.value);
     }
 });
 
+// Écouteur pour le nouveau système de tri
+if (selectTri) {
+    selectTri.addEventListener("change", () => {
+        afficherLesPokemons(); // Relance l'affichage avec le nouveau tri
+    });
+}
+
 const genererBadges = async () => {
+    // ... (Reste inchangé) ...
     try {
         const reponseTypes = await fetch("https://tyradex.app/api/v1/types");
         if (!reponseTypes.ok) throw new Error("Impossible de recup les types");
@@ -159,5 +176,6 @@ const genererBadges = async () => {
         console.error(erreurBadges.message);
     }
 };
+
 chargerApi("Tout");
 genererBadges();

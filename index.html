@@ -10,10 +10,12 @@
     <script defer src="./js/script.js" type="module"></script>
 </head>
 <body>
-<h2>Sélectionner la génération de Pokémon :</h2>
+<h2>Filtrer et trier les Pokémon :</h2>
+
 <section id="filtre">
     <div class="select">
-        <select>
+        <label for="select-gen">Génération :</label>
+        <select id="select-gen">
             <option value="Tout">Tout</option>
             <option value="1">Génération 1</option>
             <option value="2">Génération 2</option>
@@ -25,21 +27,24 @@
             <option value="8">Génération 8</option>
             <option value="9">Génération 9</option>
         </select>
-
     </div>
-    <div class="select"><select>
-        <option value="Nom">Nom</option>
-        <option value="HP">HP</option>
-        <option value="Attaque">Attaque</option>
-    </select></div>
+
+    <div class="select">
+        <label for="tri-pokemon">Trier par :</label>
+        <select id="tri-pokemon">
+            <option value="id">Numéro du Pokédex</option>
+            <option value="nom">Nom (A-Z)</option>
+            <option value="type">Type principal</option>
+            <option value="hp">Points de vie</option>
+            <option value="atk">Attaque</option>
+            <option value="def">Défense</option>
+        </select>
+    </div>
 </section>
-<div id="types">
-    <div>
-        <img alt="alt" src="url">
-    </div>
-</div>
 
-<main>
-</main>
+<div id="types"></div>
+
+<main></main>
+
 </body>
 </html>
