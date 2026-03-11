@@ -1,5 +1,5 @@
-const selectGen = document.querySelector("#select-gen"); // Attention si tu as 2 select, il vaut mieux utiliser l'ID : document.querySelector("#ton-id-gen")
-const selectTri = document.querySelector("#tri-pokemon"); // Ajout du sélecteur pour le tri
+const selectGen = document.querySelector("#select-gen");
+const selectTri = document.querySelector("#tri-pokemon");
 const conteneurMain = document.querySelector("main");
 const divBadges = document.querySelector("#types");
 
@@ -8,24 +8,39 @@ let typesSelectionnes = [];
 
 const avoirCouleur = (type) => {
     const couleurs = {
-        "Plante": "green", "Feu": "orange", "Eau": "blue", "Insecte": "lightgreen",
-        "Normal": "lightgray", "Électrik": "yellow", "Poison": "purple", "Combat": "red",
-        "Sol": "burlywood", "Roche": "darkkhaki", "Spectre": "indigo", "Acier": "silver",
-        "Glace": "lightblue", "Dragon": "royalblue", "Fée": "pink", "Ténèbres": "darkslategray",
-        "Psy": "hotpink", "Vol": "skyblue"
+        "Plante": "green",
+        "Feu": "orange",
+        "Eau": "blue",
+        "Insecte": "lightgreen",
+        "Normal": "lightgray",
+        "Électrik": "yellow",
+        "Poison": "purple",
+        "Combat": "red",
+        "Sol": "burlywood",
+        "Roche": "darkkhaki",
+        "Spectre": "indigo",
+        "Acier": "silver",
+        "Glace": "lightblue",
+        "Dragon": "royalblue",
+        "Fée": "pink",
+        "Ténèbres": "darkslategray",
+        "Psy": "hotpink",
+        "Vol": "skyblue"
     };
     return couleurs[type] || "white";
 };
 
 const afficherLesPokemons = () => {
-    // 1. Filtrage
     let pkmFiltres = listePokemons.filter(pokemon => {
         if (typesSelectionnes.length === 0) return true;
         let lesTypesDuPkm = pokemon.types.map(t => t.name);
         return typesSelectionnes.every(typeChoisi => lesTypesDuPkm.includes(typeChoisi));
     });
 
-    // 2. Tri
+    const calculerTotalStats = (p) => {
+        return p.stats.hp + p.stats.atk + p.stats.def + p.stats.spe_atk + (p.stats.spe_def || 0) + p.stats.vit;
+    };
+
     let critereTri = selectTri ? selectTri.value : "id";
     let pkmTries = pkmFiltres.sort((a, b) => {
         switch (critereTri) {
@@ -33,19 +48,20 @@ const afficherLesPokemons = () => {
                 return a.name.fr.localeCompare(b.name.fr);
             case "type":
                 return a.types[0].name.localeCompare(b.types[0].name);
+            case "total":
+                return calculerTotalStats(b) - calculerTotalStats(a);
             case "hp":
-                return b.stats.hp - a.stats.hp; // Plus grand au plus petit
+                return b.stats.hp - a.stats.hp;
             case "atk":
                 return b.stats.atk - a.stats.atk;
             case "def":
                 return b.stats.def - a.stats.def;
             case "id":
             default:
-                return a.pokedexId - b.pokedexId; // Plus petit au plus grand
+                return a.pokedexId - b.pokedexId;
         }
     });
 
-    // 3. Affichage
     let cartesHtml = pkmTries.map(pokemon => {
         let type1 = pokemon.types[0].name;
         let couleur1 = avoirCouleur(type1);
@@ -58,6 +74,7 @@ const afficherLesPokemons = () => {
         }
 
         let texteTypes = pokemon.types.map(t => t.name).join(" / ");
+        let total = calculerTotalStats(pokemon);
 
         return `
         <article style="background: ${styleFond}; border: 10px solid ${couleur1}">
@@ -72,8 +89,11 @@ const afficherLesPokemons = () => {
                         <li>Points de vie : ${pokemon.stats.hp}</li>
                         <li>Attaque : ${pokemon.stats.atk}</li>
                         <li>Défense : ${pokemon.stats.def}</li>
-                        <li>Attaque spéciale : ${pokemon.stats.spe_atk}</li>
+                        <li>Atq. spéciale : ${pokemon.stats.spe_atk}</li>
+                        <li>Déf. spéciale : ${pokemon.stats.spe_def || '0'}</li>
                         <li>Vitesse : ${pokemon.stats.vit}</li>
+                        <hr style="margin: 8px 0; border: 0; border-top: 1px dashed #ccc;">
+                        <li style="font-size: 1.1em;"><strong>Total : ${total}</strong></li>
                     </ol>
                 </figcaption>
             </figure>
@@ -103,22 +123,21 @@ const chargerApi = async (valeurGen) => {
     }
 };
 
-// Écouteur pour la génération
-selectGen.addEventListener("change", (event) => {
-    if (event.target.value) {
-        chargerApi(event.target.value);
-    }
-});
+if (selectGen) {
+    selectGen.addEventListener("change", (event) => {
+        if (event.target.value) {
+            chargerApi(event.target.value);
+        }
+    });
+}
 
-// Écouteur pour le nouveau système de tri
 if (selectTri) {
     selectTri.addEventListener("change", () => {
-        afficherLesPokemons(); // Relance l'affichage avec le nouveau tri
+        afficherLesPokemons();
     });
 }
 
 const genererBadges = async () => {
-    // ... (Reste inchangé) ...
     try {
         const reponseTypes = await fetch("https://tyradex.app/api/v1/types");
         if (!reponseTypes.ok) throw new Error("Impossible de recup les types");
