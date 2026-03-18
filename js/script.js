@@ -127,88 +127,80 @@ const afficherLesPokemons = () => {
 
 const chargerApi = async (valeurGen) => {
     conteneurMain.innerHTML = "<p>Chargement...</p>";
-    try {
-        const lien = (valeurGen === "Tout")
-            ? "https://tyradex.app/api/v1/pokemon"
-            : `https://tyradex.app/api/v1/gen/${valeurGen}`;
+    const lien = (valeurGen === "Tout")
+        ? "https://tyradex.app/api/v1/pokemon"
+        : `https://tyradex.app/api/v1/gen/${valeurGen}`;
 
-        const reponse = await fetch(lien);
-        if (!reponse.ok) throw new Error("Bug réseau");
+    const reponse = await fetch(lien);
+    if (!reponse.ok) throw new Error("Bug réseau");
 
-        const dataJson = await reponse.json();
+    const dataJson = await reponse.json();
 
 
-        listePokemons = dataJson
-            .filter(p => p.types && p.types.length > 0)
-            .map(p => new Pokemon(p));
+    listePokemons = dataJson
+        .filter(p => p.types && p.types.length > 0)
+        .map(p => new Pokemon(p));
 
-        afficherLesPokemons();
-    } catch (erreur) {
-        conteneurMain.innerHTML = `<p style="color:red">Erreur : ${erreur.message}</p>`;
-    }
+    afficherLesPokemons();
 };
 
 
 const genererBadges = async () => {
-    try {
-        const reponseTypes = await fetch("https://tyradex.app/api/v1/types");
-        if (!reponseTypes.ok) throw new Error("Impossible de récupérer les types");
+    const reponseTypes = await fetch("https://tyradex.app/api/v1/types");
+    if (!reponseTypes.ok) throw new Error("Impossible de récupérer les types");
 
-        const dataTypes = await reponseTypes.json();
+    const dataTypes = await reponseTypes.json();
 
-        if (!divBadges) return;
-        divBadges.innerHTML = "";
+    if (!divBadges) return;
+    divBadges.innerHTML = "";
 
 
-        const btnReset = document.createElement("button");
-        btnReset.classList.add("type-filter", "reset-btn", "active");
-        btnReset.innerHTML = "<p>TOUT</p>";
+    const btnReset = document.createElement("button");
+    btnReset.classList.add("type-filter", "reset-btn", "active");
+    btnReset.innerHTML = "<p>TOUT</p>";
 
-        btnReset.addEventListener("click", () => {
-            typesSelectionnes = [];
-            document.querySelectorAll(".type-filter").forEach(b => b.classList.remove("active"));
-            btnReset.classList.add("active");
+    btnReset.addEventListener("click", () => {
+        typesSelectionnes = [];
+        document.querySelectorAll(".type-filter").forEach(b => b.classList.remove("active"));
+        btnReset.classList.add("active");
+        afficherLesPokemons();
+    });
+
+    divBadges.appendChild(btnReset);
+
+    // Badges pour chaque type
+    dataTypes.forEach(typeActuel => {
+        const type = new Type(typeActuel);
+        const boutonBadge = document.createElement("button");
+        boutonBadge.classList.add("type-filter");
+
+        const imageType = document.createElement("img");
+        imageType.src = type.image;
+        imageType.alt = type.name;
+        imageType.title = type.name;
+
+        boutonBadge.appendChild(imageType);
+
+        boutonBadge.addEventListener("click", () => {
+            if (boutonBadge.classList.contains("active")) {
+                boutonBadge.classList.remove("active");
+                typesSelectionnes = typesSelectionnes.filter(t => t !== type.name);
+            } else {
+                if (typesSelectionnes.length >= 2) return;
+                btnReset.classList.remove("active");
+                boutonBadge.classList.add("active");
+                typesSelectionnes.push(type.name);
+            }
+
+            if (typesSelectionnes.length === 0) {
+                btnReset.classList.add("active");
+            }
+
             afficherLesPokemons();
         });
 
-        divBadges.appendChild(btnReset);
-
-        // Badges pour chaque type
-        dataTypes.forEach(typeActuel => {
-            const type = new Type(typeActuel);
-            const boutonBadge = document.createElement("button");
-            boutonBadge.classList.add("type-filter");
-
-            const imageType = document.createElement("img");
-            imageType.src = type.image;
-            imageType.alt = type.name;
-            imageType.title = type.name;
-
-            boutonBadge.appendChild(imageType);
-
-            boutonBadge.addEventListener("click", () => {
-                if (boutonBadge.classList.contains("active")) {
-                    boutonBadge.classList.remove("active");
-                    typesSelectionnes = typesSelectionnes.filter(t => t !== type.name);
-                } else {
-                    if (typesSelectionnes.length >= 2) return;
-                    btnReset.classList.remove("active");
-                    boutonBadge.classList.add("active");
-                    typesSelectionnes.push(type.name);
-                }
-
-                if (typesSelectionnes.length === 0) {
-                    btnReset.classList.add("active");
-                }
-
-                afficherLesPokemons();
-            });
-
-            divBadges.appendChild(boutonBadge);
-        });
-    } catch (erreurBadges) {
-        console.error(erreurBadges.message);
-    }
+        divBadges.appendChild(boutonBadge);
+    });
 };
 
 if (selectGen) {
